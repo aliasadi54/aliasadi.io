@@ -1,0 +1,45 @@
+# Maintainer: Philip Müller <philm[at]manjaro[dog]org>
+# Contributor: pdlinux.ir 
+
+pkgbase=grub-theme-hacker
+pkgname=('grub-theme-hacker-common' 'grub-theme-hacker-live' 'grub-theme-hacker')
+pkgver=20.2
+pkgrel=16
+pkgdesc="Linux grub theme Hacker"
+arch=('any')
+url="https://github.com/pdlinux/aliasadi.io/tree/master/Packages/grub-theme-hacker"
+license=('GPL-3.0-or-later')
+makedepends=('git')
+_commit=1230
+source=("git+$url.git#commit=$_commit")
+sha256sums=('SKIP')
+
+package_grub-theme-hacker-common() {
+  pkgdesc+=" for live ISO (common files)"
+  depends=('grub')
+  conflicts=('grub-theme-hacker')
+  replaces=('grub-theme-hacker')
+
+  cd grub-theme
+  make PREFIX=/usr DESTDIR="${pkgdir}" install_common
+}
+
+package_grub-theme-hacker-live() {
+  pkgdesc+=" for live ISO"
+  depends=('grub-theme-hacker-live')
+
+  cd grub-theme
+  make PREFIX=/usr DESTDIR="${pkgdir}" install_pdlinux
+}
+
+package_grub-theme-hacker() {
+  depends=('grub')
+  install=grub-theme-hacker.install
+
+  cd grub-theme/grub-theme-hacker
+
+  # remove welcome message
+  sed -i -e 's,.*text = "Welcome to PdLinux".*,#text = "Welcome to PdLinux",' theme.txt
+
+  find . -type f -exec install -D -m644 {} "${pkgdir}"/usr/share/grub/themes/grub-theme-hacker/{} \;
+}
